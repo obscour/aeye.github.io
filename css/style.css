@@ -1,0 +1,80 @@
+/* General */
+body {
+    background: url('https://source.unsplash.com/1600x900/?technology,ai') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Login container centered */
+  .d-flex {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  
+  /* Login box */
+  .login-box {
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.85);
+    border-radius: 15px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Header */
+  .login-box h3 {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 1rem;
+    font-weight: bold;
+  }
+  
+  /* Form label */
+  .form-floating label {
+    color: #333;
+    font-weight: bold;
+  }
+  
+  /* Input field */
+  .form-control {
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    box-shadow: none;
+    transition: all 0.3s ease;
+  }
+  
+  /* Focused input field */
+  .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  /* Submit button */
+  .btn-primary {
+    background-color: #007bff;
+    border: none;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+  }
+  
+  /* Submit button hover effect */
+  .btn-primary:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+  }
+  
+  /* Responsiveness */
+  @media (max-width: 576px) {
+    .login-box {
+      width: 90%;
+      padding: 1.5rem;
+    }
+  }
+  
