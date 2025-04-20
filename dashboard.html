@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>A.Eye Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="css/style.css" rel="stylesheet"/>
+</head>
+<body class="light">
+  <!-- Theme Toggle Button -->
+  <button id="themeToggle" class="btn btn-sm btn-secondary position-absolute top-0 end-0 m-3">Toggle Theme</button>
+
+  <div class="container my-5">
+    <h2 class="mb-4 text-center">Student Progress Dashboard</h2>
+    <div class="card p-4">
+      <h5 class="card-title">Braille Letter Performance</h5>
+      <table class="table table-bordered mt-3">
+        <thead class="table-light">
+          <tr>
+            <th>Letter</th>
+            <th>Accuracy (%)</th>
+            <th>Time Taken (s)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>A</td>
+            <td>92</td>
+            <td>4.2</td>
+          </tr>
+          <tr>
+            <td>B</td>
+            <td>85</td>
+            <td>5.1</td>
+          </tr>
+          <tr>
+            <td>C</td>
+            <td>78</td>
+            <td>6.3</td>
+          </tr>
+          <!-- can add more data -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+</body>
+</html>
