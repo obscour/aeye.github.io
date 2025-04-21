@@ -39,8 +39,8 @@ const testAccounts = {
     const devicePassword = document.getElementById('devicePassword').value;
   
     // Simple login validation (replace with your actual validation logic)
-    if (deviceId === "yourValidDeviceID" && devicePassword === "yourValidPassword") {
-        // Redirect to dashboard
+    if (testAccounts[deviceId] && testAccounts[deviceId] === devicePassword) {
+        // Redirect to dashboard if valid
         window.location.href = 'dashboard.html';
     } else {
         // Show the error message
