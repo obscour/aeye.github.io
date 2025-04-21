@@ -37,6 +37,9 @@ const testAccounts = {
     // Get input values
     const deviceId = document.getElementById('deviceId').value;
     const devicePassword = document.getElementById('devicePassword').value;
+
+    // logs
+    console.log("Attempting login with Device ID: " + deviceId + " and Password: " + devicePassword);
   
     // Simple login validation (replace with your actual validation logic)
     if (testAccounts[deviceId] && testAccounts[deviceId] === devicePassword) {
