@@ -17,6 +17,7 @@
       }
       .main-content-mobile {
         padding: 1rem 0.5rem;
+        margin-left: 0 !important;
       }
       .qrcode-wrapper {
         max-width: 250px;
@@ -49,9 +50,21 @@
     }
     /* Wider sidebar on desktop */
     @media (min-width: 768px) {
-      .sidebar {
+      .fixed-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
         min-width: 270px;
         max-width: 320px;
+        z-index: 1030;
+        border-right: 1px solid #e0e0e0;
+        background: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+      }
+      .main-content-mobile {
+        margin-left: 270px;
       }
     }
     /* Table column widths */
@@ -84,7 +97,7 @@
   <div class="container-fluid">
     <div class="row">
       <!-- Sidebar for md+ screens -->
-      <div class="col-md-3 col-lg-2 d-none d-md-flex bg-light sidebar flex-column align-items-stretch" style="min-height: 100vh; position: relative;">
+      <div class="d-none d-md-flex bg-light sidebar flex-column align-items-stretch fixed-sidebar">
         <div>
           <div class="position-sticky pt-3">
             <div class="text-center mb-4">
@@ -135,11 +148,11 @@
               <table class="table table-bordered mt-3" id="userStatsTable">
                 <thead>
                   <tr>
-                    <th class="char-col">Char</th>
-                    <th class="stat-col">Attempt</th>
-                    <th class="stat-col">Mastery</th>
-                    <th class="stat-col">No. of Correct Answer</th>
-                    <th class="stat-col">Average Response Time</th>
+                    <th class="char-col sortable" data-column="alphanumeric_char">Char</th>
+                    <th class="stat-col sortable" data-column="attempts">Attempt</th>
+                    <th class="stat-col sortable" data-column="mastery_score">Mastery</th>
+                    <th class="stat-col sortable" data-column="correct_count">No. of Correct Answer</th>
+                    <th class="stat-col sortable" data-column="avg_response_time">Average Response Time</th>
                   </tr>
                 </thead>
                 <tbody id="userStatsBody">
