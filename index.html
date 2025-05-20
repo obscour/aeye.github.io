@@ -168,6 +168,23 @@
               .from('profiles')
               .insert([{ id: data.user.id, email, username, first_name: firstName, last_name: lastName }]);
             if (insertError) throw insertError;
+
+            // Insert into user_stats table (one row for each alphanumeric_char A-Z, 0-9)
+            const chars = [
+              ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+            ];
+            const statsRows = chars.map(char => ({
+              user_id: data.user.id,
+              alphanumeric_char: char,
+              correct_count: 0,
+              attempts: 0,
+              avg_response_time: null,
+              mastery_score: null
+            }));
+            const { error: statsError } = await supabase
+              .from('user_stats')
+              .insert(statsRows);
+            if (statsError) throw statsError;
           }
 
           errorMessage.style.display = 'none';
