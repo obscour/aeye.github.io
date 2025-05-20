@@ -4,10 +4,8 @@ This is the companion website for the **A.Eye** device — an assistive tool tha
 
 ## Features
 
-- Google Sign-In to connect the device
 - Dashboard for parents/teachers to track progress
-- Device supports up to 3 users
-- Item recognition via AI
+- Device supports multiple users
 - Tracks performance per Braille letter
 
 ## Deployment
