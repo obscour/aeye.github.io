@@ -22,8 +22,8 @@
     <!-- Login Form -->
     <form id="loginForm">
       <div class="form-floating mb-3">
-        <input type="email" class="form-control" id="email" placeholder="Email" required />
-        <label for="email">Email</label>
+        <input type="text" class="form-control" id="loginIdentifier" placeholder="Email or Username" required />
+        <label for="loginIdentifier">Email or Username</label>
       </div>
       <div class="form-floating mb-4">
         <input type="password" class="form-control" id="password" placeholder="Password" required />
@@ -38,8 +38,16 @@
     <!-- Registration Form -->
     <form id="registerForm" style="display: none;">
       <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="fullName" placeholder="Full Name" required />
-        <label for="fullName">Full Name</label>
+        <input type="text" class="form-control" id="firstName" placeholder="First Name" required />
+        <label for="firstName">First Name</label>
+      </div>
+      <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="lastName" placeholder="Last Name" required />
+        <label for="lastName">Last Name</label>
+      </div>
+      <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="registerUsername" placeholder="Username" required />
+        <label for="registerUsername">Username</label>
       </div>
       <div class="form-floating mb-3">
         <input type="email" class="form-control" id="registerEmail" placeholder="Email" required />
@@ -93,7 +101,7 @@
       // LOGIN
       document.getElementById('loginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = document.getElementById('email').value;
+        const identifier = document.getElementById('loginIdentifier').value.trim();
         const password = document.getElementById('password').value;
         const errorMessage = document.getElementById('error-message');
         const successMessage = document.getElementById('success-message');
@@ -102,7 +110,21 @@
         successMessage.style.display = 'none';
         successMessage.textContent = '';
         try {
-          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+          let emailToUse = identifier;
+          // If not an email, try to look up by username
+          if (!identifier.includes('@')) {
+            const { data: userProfile, error: userProfileError } = await supabase
+              .from('profiles')
+              .select('email')
+              .eq('username', identifier)
+              .single();
+            if (userProfile && userProfile.email) {
+              emailToUse = userProfile.email;
+            } else {
+              throw new Error('No user found with that username');
+            }
+          }
+          const { data, error } = await supabase.auth.signInWithPassword({ email: emailToUse, password });
           if (error) throw error;
           window.location.href = 'dashboard.html';
         } catch (error) {
@@ -114,7 +136,9 @@
       // REGISTER
       document.getElementById('registerForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const fullName = document.getElementById('fullName').value;
+        const firstName = document.getElementById('firstName').value;
+        const lastName = document.getElementById('lastName').value;
+        const username = document.getElementById('registerUsername').value;
         const email = document.getElementById('registerEmail').value;
         const password = document.getElementById('registerPassword').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
@@ -134,16 +158,18 @@
           const { data, error } = await supabase.auth.signUp({
             email,
             password,
-            options: { data: { full_name: fullName } }
+            options: { data: { first_name: firstName, last_name: lastName, username } }
           });
           if (error) throw error;
-          // Insert into users table
+
+          // Insert into profiles table (with id, email, username, first_name, last_name)
           if (data.user) {
             const { error: insertError } = await supabase
-              .from('users')
-              .insert([{ email, username: fullName, user_id: data.user.id }]);
+              .from('profiles')
+              .insert([{ id: data.user.id, email, username, first_name: firstName, last_name: lastName }]);
             if (insertError) throw insertError;
           }
+
           errorMessage.style.display = 'none';
           successMessage.style.display = 'block';
           successMessage.textContent = 'Registration successful! Please login.';

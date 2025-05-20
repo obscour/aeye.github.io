@@ -8,145 +8,145 @@
   <link href="css/styles.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* Custom tweaks for mobile */
+    @media (max-width: 767.98px) {
+      .sidebar-offcanvas {
+        width: 80vw !important;
+        max-width: 320px;
+      }
+      .main-content-mobile {
+        padding: 1rem 0.5rem;
+      }
+      .qrcode-wrapper {
+        max-width: 250px;
+      }
+      #qrcode.d-inline-block img, #qrcode.d-inline-block canvas,
+      #qrcodeMobile.d-inline-block img, #qrcodeMobile.d-inline-block canvas {
+        max-width: 190px;
+      }
+    }
+    @media (max-width: 575.98px) {
+      .table-responsive {
+        font-size: 0.95rem;
+      }
+      .card-title {
+        font-size: 1.1rem;
+      }
+    }
+    /* Responsive QR code */
+    .qrcode-wrapper {
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+    #qrcode.d-inline-block img, #qrcode.d-inline-block canvas,
+    #qrcodeMobile.d-inline-block img, #qrcodeMobile.d-inline-block canvas {
+      width: 100% !important;
+      height: auto !important;
+      display: block;
+      margin: 0 auto;
+    }
+    /* Wider sidebar on desktop */
+    @media (min-width: 768px) {
+      .sidebar {
+        min-width: 270px;
+        max-width: 320px;
+      }
+    }
+    /* Table column widths */
+    #userStatsTable th.char-col, #userStatsTable td.char-col {
+      min-width: 28px;
+      max-width: 40px;
+      width: auto;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      text-align: center;
+    }
+    #userStatsTable th.stat-col, #userStatsTable td.stat-col {
+      min-width: 110px;
+      width: auto;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
+  <!-- Navbar for mobile -->
+  <nav class="navbar navbar-light bg-light d-md-none">
+    <div class="container-fluid">
+      <button class="btn btn-outline-primary me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <span class="navbar-brand mb-0 h1">A.Eye Dashboard</span>
+    </div>
+  </nav>
+
   <div class="container-fluid">
     <div class="row">
-      <!-- Sidebar -->
-      <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" style="min-height: 100vh;">
-        <div class="position-sticky pt-3">
+      <!-- Sidebar for md+ screens -->
+      <div class="col-md-3 col-lg-2 d-none d-md-flex bg-light sidebar flex-column align-items-stretch" style="min-height: 100vh; position: relative;">
+        <div>
+          <div class="position-sticky pt-3">
+            <div class="text-center mb-4">
+              <h5 id="currentUser">Loading...</h5>
+            </div>
+            <div class="text-center mb-4">
+              <div class="qrcode-wrapper">
+                <div id="qrcode" class="d-inline-block"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex-grow-1"></div>
+        <div class="p-3">
+          <button class="btn btn-danger w-100" onclick="logout()">Logout</button>
+        </div>
+      </div>
+
+      <!-- Offcanvas Sidebar for mobile -->
+      <div class="offcanvas offcanvas-start sidebar-offcanvas d-md-none" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="sidebarOffcanvasLabel">A.Eye</h5>
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body d-flex flex-column h-100">
           <div class="text-center mb-4">
-            <h5 id="currentUser">Loading...</h5>
+            <h5 id="currentUserMobile">Loading...</h5>
           </div>
           <div class="text-center mb-4">
-            <div id="qrcode" class="d-inline-block"></div>
+            <div class="qrcode-wrapper">
+              <div id="qrcodeMobile" class="d-inline-block"></div>
+            </div>
           </div>
-          <div class="text-center">
-            <button class="btn btn-danger" onclick="logout()">Logout</button>
+          <div class="flex-grow-1"></div>
+          <div class="p-3">
+            <button class="btn btn-danger w-100" onclick="logout()" data-bs-dismiss="offcanvas">Logout</button>
           </div>
         </div>
       </div>
 
       <!-- Main content -->
-      <div class="col-md-9 col-lg-10 ms-sm-auto px-md-4">
+      <div class="col-md-9 col-lg-10 ms-sm-auto px-md-4 main-content-mobile">
         <div class="container my-5">
-          <h2 class="mb-4 text-center">Student Progress Dashboard</h2>
+          <h2 class="mb-4 text-center">User Statistics</h2>
           <div class="card p-4">
-            <h5 class="card-title">Braille Letter Performance</h5>
-            <table class="table table-bordered mt-3">
-              <thead>
-                <tr>
-                  <th>Letter</th>
-                  <th>Accuracy (%)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>A</td>
-                  <td>92</td>
-                </tr>
-                <tr>
-                  <td>B</td>
-                  <td>85</td>
-                </tr>
-                <tr>
-                  <td>C</td>
-                  <td>78</td>
-                </tr>
-                <tr>
-                  <td>D</td>
-                  <td>92</td>
-                </tr>
-                <tr>
-                  <td>E</td>
-                  <td>85</td>
-                </tr>
-                <tr>
-                  <td>F</td>
-                  <td>78</td>
-                </tr>
-                <tr>
-                  <td>G</td>
-                  <td>92</td>
-                </tr>
-                <tr>
-                  <td>H</td>
-                  <td>85</td>
-                </tr>
-                <tr>
-                  <td>I</td>
-                  <td>78</td>
-                </tr>
-                <tr>
-                  <td>J</td>
-                  <td>92</td>
-                </tr>
-                <tr>
-                  <td>K</td>
-                  <td>85</td>
-                </tr>
-                <tr>
-                  <td>L</td>
-                  <td>78</td>
-                </tr>
-                <tr>
-                  <td>M</td>
-                  <td>92</td>
-                </tr>
-                <tr>
-                  <td>N</td>
-                  <td>85</td>
-                </tr>
-                <tr>
-                  <td>O</td>
-                  <td>78</td>
-                </tr>
-                <tr>
-                  <td>P</td>
-                  <td>92</td>
-                </tr>
-                <tr>
-                  <td>Q</td>
-                  <td>85</td>
-                </tr>
-                <tr>
-                  <td>R</td>
-                  <td>78</td>
-                </tr>
-                <tr>
-                  <td>S</td>
-                  <td>92</td>
-                </tr>
-                <tr>
-                  <td>T</td>
-                  <td>85</td>
-                </tr>
-                <tr>
-                  <td>U</td>
-                  <td>78</td>
-                </tr>
-                <tr>
-                  <td>V</td>
-                  <td>92</td>
-                </tr>
-                <tr>
-                  <td>W</td>
-                  <td>85</td>
-                </tr>
-                <tr>
-                  <td>X</td>
-                  <td>78</td>
-                </tr>
-                <tr>
-                  <td>Y</td>
-                  <td>92</td>
-                </tr>
-                <tr>
-                  <td>Z</td>
-                  <td>85</td>
-                </tr>
-              </tbody>
-            </table>
+            <h5 class="card-title">Performance Sheet</h5>
+            <div class="table-responsive">
+              <table class="table table-bordered mt-3" id="userStatsTable">
+                <thead>
+                  <tr>
+                    <th class="char-col">Char</th>
+                    <th class="stat-col">Attempt</th>
+                    <th class="stat-col">Mastery</th>
+                    <th class="stat-col">No. of Correct Answer</th>
+                    <th class="stat-col">Average Response Time</th>
+                  </tr>
+                </thead>
+                <tbody id="userStatsBody">
+                  <tr><td colspan="5" class="text-center">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -154,6 +154,7 @@
   </div>
 
   <script src="js/app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Initialize Supabase client
@@ -161,8 +162,8 @@
       const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1Y2FuYm53Y2pxa3FqdHJmbmFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcwOTY4MDQsImV4cCI6MjA2MjY3MjgwNH0.M_hApPRLueaT3CyQKcuj01plUeE6jg_TU2661dSlOGA";
       const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-      // Function to generate QR code
-      async function generateQRCode() {
+      // Function to generate QR code (larger)
+      async function generateQRCode({ onlyMobile = false } = {}) {
         try {
           const { data: { user }, error } = await supabase.auth.getUser();
           if (error || !user) throw error || new Error('No user logged in');
@@ -175,18 +176,38 @@
           };
 
           const qrData = JSON.stringify(qrPayload);
-          const qrcodeDiv = document.getElementById('qrcode');
-          qrcodeDiv.innerHTML = '';
-
-          new QRCode(qrcodeDiv, {
-            text: qrData,
-            width: 128,
-            height: 128
-          });
+          if (!onlyMobile) {
+            // Desktop sidebar
+            const qrcodeDiv = document.getElementById('qrcode');
+            if (qrcodeDiv) {
+              qrcodeDiv.innerHTML = '';
+              new QRCode(qrcodeDiv, {
+                text: qrData,
+                width: 260,
+                height: 260
+              });
+            }
+          }
+          // Mobile offcanvas
+          const qrcodeMobileDiv = document.getElementById('qrcodeMobile');
+          if (qrcodeMobileDiv) {
+            qrcodeMobileDiv.innerHTML = '';
+            // Use larger QR code on mobile
+            const isMobile = window.innerWidth < 768;
+            new QRCode(qrcodeMobileDiv, {
+              text: qrData,
+              width: isMobile ? 190 : 160,
+              height: isMobile ? 190 : 160
+            });
+          }
         } catch (error) {
           const qrcodeDiv = document.getElementById('qrcode');
           if (qrcodeDiv) {
             qrcodeDiv.innerHTML = `<div class='text-danger'>QR code error: ${error?.message || error}</div>`;
+          }
+          const qrcodeMobileDiv = document.getElementById('qrcodeMobile');
+          if (qrcodeMobileDiv) {
+            qrcodeMobileDiv.innerHTML = `<div class='text-danger'>QR code error: ${error?.message || error}</div>`;
           }
           console.error('Error generating QR code:', error?.message || error);
         }
@@ -198,18 +219,29 @@
           const { data: { user }, error } = await supabase.auth.getUser();
           if (error || !user) throw error || new Error('No user logged in');
 
-          // Get full name from user_metadata if available
-          const fullName = user.user_metadata && user.user_metadata.full_name;
-          const email = user.email;
+          // Fetch profile from profiles table
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('username, first_name, last_name')
+            .eq('id', user.id)
+            .single();
 
-          if (fullName) {
-            document.getElementById('currentUser').innerHTML = `Welcome, <strong>${fullName}</strong><br><small>${email}</small>`;
-          } else {
-            document.getElementById('currentUser').innerHTML = `Welcome, <strong>${email}</strong>`;
-          }
+          const welcomeText = profile
+            ? `Welcome! <strong>${profile.username}</strong> (${profile.last_name}, ${profile.first_name})`
+            : `Welcome! <strong>${user.email}</strong>`;
+
+          // Desktop sidebar
+          const currentUserDiv = document.getElementById('currentUser');
+          if (currentUserDiv) currentUserDiv.innerHTML = welcomeText;
+          // Mobile offcanvas
+          const currentUserMobileDiv = document.getElementById('currentUserMobile');
+          if (currentUserMobileDiv) currentUserMobileDiv.innerHTML = welcomeText;
         } catch (error) {
           console.error('Error getting user:', error?.message || error);
-          document.getElementById('currentUser').textContent = 'Welcome, Guest';
+          const currentUserDiv = document.getElementById('currentUser');
+          if (currentUserDiv) currentUserDiv.textContent = 'Welcome, Guest';
+          const currentUserMobileDiv = document.getElementById('currentUserMobile');
+          if (currentUserMobileDiv) currentUserMobileDiv.textContent = 'Welcome, Guest';
         }
       }
 
@@ -226,9 +258,51 @@
       }
       window.logout = logout;
 
+      // Function to fetch and display user stats
+      async function displayUserStats() {
+        try {
+          const { data: { user }, error } = await supabase.auth.getUser();
+          if (error || !user) throw error || new Error('No user logged in');
+
+          const { data: stats, error: statsError } = await supabase
+            .from('user_stats')
+            .select('alphanumeric_char, attempts, mastery_score, correct_count, avg_response_time')
+            .eq('user_id', user.id);
+
+          const tbody = document.getElementById('userStatsBody');
+          tbody.innerHTML = '';
+          if (stats && stats.length > 0) {
+            stats.forEach(row => {
+              tbody.innerHTML += `<tr>
+                <td>${row.alphanumeric_char}</td>
+                <td>${row.attempts}</td>
+                <td>${row.mastery_score}</td>
+                <td>${row.correct_count}</td>
+                <td>${row.avg_response_time}</td>
+              </tr>`;
+            });
+          } else {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center">No data found.</td></tr>';
+          }
+        } catch (error) {
+          const tbody = document.getElementById('userStatsBody');
+          tbody.innerHTML = `<tr><td colspan="5" class="text-danger text-center">Error: ${error?.message || error}</td></tr>`;
+          console.error('Error fetching user stats:', error?.message || error);
+        }
+      }
+
       // Initialize sidebar content
       displayCurrentUser();
       generateQRCode();
+      displayUserStats();
+
+      // Regenerate QR code for mobile every time offcanvas is shown
+      const sidebarOffcanvas = document.getElementById('sidebarOffcanvas');
+      if (sidebarOffcanvas) {
+        sidebarOffcanvas.addEventListener('shown.bs.offcanvas', function () {
+          generateQRCode({ onlyMobile: true });
+        });
+      }
     });
   </script>
 </body>
