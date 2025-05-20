@@ -1,0 +1,63 @@
+/* General Styles */
+body {
+    background-image: url(indexBGimg.jpg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    background-size: cover;
+  }
+
+  /* Login Box Styles */
+  .login-box {
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.85);
+    border-radius: 15px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Form Floating Input Styles */
+  .form-floating label {
+    color: #333;
+    font-weight: bold;
+  }
+  
+  /* Form Input Field Styles */
+  .form-control {
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    box-shadow: none;
+    transition: all 0.3s ease;
+  }
+  
+  /* Focused Input Field */
+  .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  /* Button Styles */
+  .btn-primary {
+    background-color: #007bff;
+    border: none;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 576px) {
+    .login-box {
+      width: 90%;
+      padding: 1.5rem;
+    }
+  }
+  

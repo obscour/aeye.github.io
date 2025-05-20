@@ -5,46 +5,231 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>A.Eye Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link href="css/style.css" rel="stylesheet"/>
+  <link href="css/styles.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="light">
-  <!-- Theme Toggle Button -->
-  <button id="themeToggle" class="btn btn-sm btn-secondary position-absolute top-0 end-0 m-3">Toggle Theme</button>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" style="min-height: 100vh;">
+        <div class="position-sticky pt-3">
+          <div class="text-center mb-4">
+            <h5 id="currentUser">Loading...</h5>
+          </div>
+          <div class="text-center mb-4">
+            <div id="qrcode" class="d-inline-block"></div>
+          </div>
+          <div class="text-center">
+            <button class="btn btn-danger" onclick="logout()">Logout</button>
+          </div>
+        </div>
+      </div>
 
-  <div class="container my-5">
-    <h2 class="mb-4 text-center">Student Progress Dashboard</h2>
-    <div class="card p-4">
-      <h5 class="card-title">Braille Letter Performance</h5>
-      <table class="table table-bordered mt-3">
-        <thead class="table-light">
-          <tr>
-            <th>Letter</th>
-            <th>Accuracy (%)</th>
-            <th>Time Taken (s)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>A</td>
-            <td>92</td>
-            <td>4.2</td>
-          </tr>
-          <tr>
-            <td>B</td>
-            <td>85</td>
-            <td>5.1</td>
-          </tr>
-          <tr>
-            <td>C</td>
-            <td>78</td>
-            <td>6.3</td>
-          </tr>
-          <!-- can add more data -->
-        </tbody>
-      </table>
+      <!-- Main content -->
+      <div class="col-md-9 col-lg-10 ms-sm-auto px-md-4">
+        <div class="container my-5">
+          <h2 class="mb-4 text-center">Student Progress Dashboard</h2>
+          <div class="card p-4">
+            <h5 class="card-title">Braille Letter Performance</h5>
+            <table class="table table-bordered mt-3">
+              <thead>
+                <tr>
+                  <th>Letter</th>
+                  <th>Accuracy (%)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>A</td>
+                  <td>92</td>
+                </tr>
+                <tr>
+                  <td>B</td>
+                  <td>85</td>
+                </tr>
+                <tr>
+                  <td>C</td>
+                  <td>78</td>
+                </tr>
+                <tr>
+                  <td>D</td>
+                  <td>92</td>
+                </tr>
+                <tr>
+                  <td>E</td>
+                  <td>85</td>
+                </tr>
+                <tr>
+                  <td>F</td>
+                  <td>78</td>
+                </tr>
+                <tr>
+                  <td>G</td>
+                  <td>92</td>
+                </tr>
+                <tr>
+                  <td>H</td>
+                  <td>85</td>
+                </tr>
+                <tr>
+                  <td>I</td>
+                  <td>78</td>
+                </tr>
+                <tr>
+                  <td>J</td>
+                  <td>92</td>
+                </tr>
+                <tr>
+                  <td>K</td>
+                  <td>85</td>
+                </tr>
+                <tr>
+                  <td>L</td>
+                  <td>78</td>
+                </tr>
+                <tr>
+                  <td>M</td>
+                  <td>92</td>
+                </tr>
+                <tr>
+                  <td>N</td>
+                  <td>85</td>
+                </tr>
+                <tr>
+                  <td>O</td>
+                  <td>78</td>
+                </tr>
+                <tr>
+                  <td>P</td>
+                  <td>92</td>
+                </tr>
+                <tr>
+                  <td>Q</td>
+                  <td>85</td>
+                </tr>
+                <tr>
+                  <td>R</td>
+                  <td>78</td>
+                </tr>
+                <tr>
+                  <td>S</td>
+                  <td>92</td>
+                </tr>
+                <tr>
+                  <td>T</td>
+                  <td>85</td>
+                </tr>
+                <tr>
+                  <td>U</td>
+                  <td>78</td>
+                </tr>
+                <tr>
+                  <td>V</td>
+                  <td>92</td>
+                </tr>
+                <tr>
+                  <td>W</td>
+                  <td>85</td>
+                </tr>
+                <tr>
+                  <td>X</td>
+                  <td>78</td>
+                </tr>
+                <tr>
+                  <td>Y</td>
+                  <td>92</td>
+                </tr>
+                <tr>
+                  <td>Z</td>
+                  <td>85</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize Supabase client
+      const SUPABASE_URL = "https://rucanbnwcjqkqjtrfnan.supabase.co";
+      const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1Y2FuYm53Y2pxa3FqdHJmbmFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcwOTY4MDQsImV4cCI6MjA2MjY3MjgwNH0.M_hApPRLueaT3CyQKcuj01plUeE6jg_TU2661dSlOGA";
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+      // Function to generate QR code
+      async function generateQRCode() {
+        try {
+          const { data: { user }, error } = await supabase.auth.getUser();
+          if (error || !user) throw error || new Error('No user logged in');
+
+          // Encode user id, email, and full_name in the QR code
+          const qrPayload = {
+            id: user.id,
+            email: user.email,
+            full_name: user.user_metadata?.full_name || ""
+          };
+
+          const qrData = JSON.stringify(qrPayload);
+          const qrcodeDiv = document.getElementById('qrcode');
+          qrcodeDiv.innerHTML = '';
+
+          new QRCode(qrcodeDiv, {
+            text: qrData,
+            width: 128,
+            height: 128
+          });
+        } catch (error) {
+          const qrcodeDiv = document.getElementById('qrcode');
+          if (qrcodeDiv) {
+            qrcodeDiv.innerHTML = `<div class='text-danger'>QR code error: ${error?.message || error}</div>`;
+          }
+          console.error('Error generating QR code:', error?.message || error);
+        }
+      }
+
+      // Function to display current user
+      async function displayCurrentUser() {
+        try {
+          const { data: { user }, error } = await supabase.auth.getUser();
+          if (error || !user) throw error || new Error('No user logged in');
+
+          // Get full name from user_metadata if available
+          const fullName = user.user_metadata && user.user_metadata.full_name;
+          const email = user.email;
+
+          if (fullName) {
+            document.getElementById('currentUser').innerHTML = `Welcome, <strong>${fullName}</strong><br><small>${email}</small>`;
+          } else {
+            document.getElementById('currentUser').innerHTML = `Welcome, <strong>${email}</strong>`;
+          }
+        } catch (error) {
+          console.error('Error getting user:', error?.message || error);
+          document.getElementById('currentUser').textContent = 'Welcome, Guest';
+        }
+      }
+
+      // Function to handle logout
+      async function logout() {
+        try {
+          const { error } = await supabase.auth.signOut();
+          if (error) throw error;
+          window.location.href = 'index.html';
+        } catch (error) {
+          alert('Logout failed: ' + (error.message || error));
+          console.error('Error signing out:', error.message || error);
+        }
+      }
+      window.logout = logout;
+
+      // Initialize sidebar content
+      displayCurrentUser();
+      generateQRCode();
+    });
+  </script>
 </body>
 </html>
