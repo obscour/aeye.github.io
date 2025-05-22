@@ -61,3 +61,73 @@ body {
     }
   }
   
+  /* Dashboard-specific styles moved from dashboard.html */
+  @media (max-width: 767.98px) {
+    .sidebar-offcanvas {
+      width: 80vw !important;
+      max-width: 320px;
+    }
+    .main-content-mobile {
+      padding: 1rem 0.5rem;
+      margin-left: 0 !important;
+    }
+    .qrcode-wrapper {
+      max-width: 250px;
+    }
+    #qrcode.d-inline-block img, #qrcode.d-inline-block canvas,
+    #qrcodeMobile.d-inline-block img, #qrcodeMobile.d-inline-block canvas {
+      max-width: 190px;
+    }
+  }
+  @media (max-width: 575.98px) {
+    .table-responsive {
+      font-size: 0.95rem;
+    }
+    .card-title {
+      font-size: 1.1rem;
+    }
+  }
+  .qrcode-wrapper {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  #qrcode.d-inline-block img, #qrcode.d-inline-block canvas,
+  #qrcodeMobile.d-inline-block img, #qrcodeMobile.d-inline-block canvas {
+    width: 100% !important;
+    height: auto !important;
+    display: block;
+    margin: 0 auto;
+  }
+  @media (min-width: 768px) {
+    .fixed-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      min-width: 270px;
+      max-width: 320px;
+      z-index: 1030;
+      border-right: 1px solid #e0e0e0;
+      background: #f8f9fa;
+      display: flex;
+      flex-direction: column;
+    }
+    .main-content-mobile {
+      margin-left: 270px;
+    }
+  }
+  #userStatsTable th.char-col, #userStatsTable td.char-col {
+    min-width: 28px;
+    max-width: 40px;
+    width: auto;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    text-align: center;
+  }
+  #userStatsTable th.stat-col, #userStatsTable td.stat-col {
+    min-width: 110px;
+    width: auto;
+    text-align: center;
+  }
+  

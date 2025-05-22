@@ -1,6 +1,6 @@
 // Supabase client init
 const SUPABASE_URL = "https://rucanbnwcjqkqjtrfnan.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1Y2FuYm53Y2pxa3FqdHJmbmFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcwOTY4MDQsImV4cCI6MjA2MjY3MjgwNH0.M_hApPRLueaT3CyQKcuj01plUeE6jg_TU2661dSlOGA";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1Y2FuYm53Y2pxa3FqdHJmbmFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc5MDc2MTEsImV4cCI6MjA2MzQ4MzYxMX0.WEblb8fwnnZmCoaKFZusO4vjPx_wk4kgSTp0WTwNbuQ";
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 function toggleForms() {
