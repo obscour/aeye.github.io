@@ -1,5 +1,5 @@
 // Supabase client init
-const SUPABASE_URL = "https://wkdkpwidvgcjkimureew.supabase.co";
+const SUPABASE_URL = "https://wkdkpwidvgcjkimureew.supabase.co/";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrZGtwd2lkdmdjamtpbXVyZWV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3OTA4MzksImV4cCI6MjA3MzM2NjgzOX0.6GNKe9fxq5xmWiKw5x7eyX3fASgG2q2avfyJZQWJI_s";
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -40,24 +40,64 @@ document.addEventListener('DOMContentLoaded', function() {
       successMessage.style.display = 'none';
       successMessage.textContent = '';
       try {
-        let emailToUse = identifier;
-        // If not an email, try to look up by username
-        if (!identifier.includes('@')) {
-          const { data: userProfile, error: userProfileError } = await supabase
-            .from('profiles')
-            .select('email')
+        // Custom login logic - check users table directly
+        let userData;
+        
+        console.log('Attempting login with:', identifier);
+        
+        if (identifier.includes('@')) {
+          // Login with email
+          console.log('Looking up user by email:', identifier);
+          const { data, error } = await supabase
+            .from('users')
+            .select('uuid, email, username, password')
+            .eq('email', identifier)
+            .single();
+          
+          console.log('Email lookup result:', { data, error });
+          
+          if (error || !data) {
+            throw new Error('No user found with that email');
+          }
+          userData = data;
+        } else {
+          // Login with username
+          console.log('Looking up user by username:', identifier);
+          const { data, error } = await supabase
+            .from('users')
+            .select('uuid, email, username, password')
             .eq('username', identifier)
             .single();
-          if (userProfile && userProfile.email) {
-            emailToUse = userProfile.email;
-          } else {
+          
+          console.log('Username lookup result:', { data, error });
+          
+          if (error || !data) {
             throw new Error('No user found with that username');
           }
+          userData = data;
         }
-        const { data, error } = await supabase.auth.signInWithPassword({ email: emailToUse, password });
-        if (error) throw error;
+        
+        console.log('Found user data:', userData);
+        console.log('Checking password. Provided:', password, 'Stored:', userData.password);
+        
+        // Check password (simple comparison for now)
+        if (userData.password !== password) {
+          throw new Error('Invalid password');
+        }
+        
+        console.log('Password match! Storing user session...');
+        
+        // Store user session in localStorage (simple approach)
+        localStorage.setItem('user', JSON.stringify({
+          id: userData.uuid,
+          email: userData.email,
+          username: userData.username
+        }));
+        
+        console.log('User session stored, redirecting to dashboard...');
         window.location.href = 'dashboard.html';
       } catch (error) {
+        console.error('Login error:', error);
         errorMessage.style.display = 'block';
         errorMessage.textContent = error.message || 'Login failed. Please check your credentials.';
       }
@@ -87,38 +127,48 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       try {
-        // Register with Supabase Auth
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { data: { first_name: firstName, last_name: lastName, username } }
-        });
-        if (error) throw error;
-
-        // Insert into profiles table (with id, email, username, first_name, last_name)
-        if (data.user) {
-          const { error: insertError } = await supabase
-            .from('profiles')
-            .insert([{ id: data.user.id, email, username, first_name: firstName, last_name: lastName }]);
-          if (insertError) throw insertError;
-
-          // Insert into user_stats table (one row for each alphanumeric_char A-Z, 0-9)
-          const chars = [
-            ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-          ];
-          const statsRows = chars.map(char => ({
-            user_id: data.user.id,
-            alphanumeric_char: char,
-            correct_count: 0,
-            attempts: 0,
-            avg_response_time: 0,
-            mastery_score: 0
-          }));
-          const { error: statsError } = await supabase
-            .from('user_stats')
-            .insert(statsRows);
-          if (statsError) throw statsError;
+        // Check if username or email already exists
+        const { data: existingUser, error: checkError } = await supabase
+          .from('users')
+          .select('username, email')
+          .or(`username.eq.${username},email.eq.${email}`)
+          .single();
+        
+        if (existingUser) {
+          if (existingUser.username === username) {
+            throw new Error('Username already exists');
+          }
+          if (existingUser.email === email) {
+            throw new Error('Email already exists');
+          }
         }
+
+        // Create initial stats JSON structure for A-Z
+        const initialStats = {};
+        for (let char of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+          initialStats[char] = {
+            streak: 0,
+            correct: 0,
+            mastery: 0,
+            attempts: 0
+          };
+        }
+
+        // Generate a UUID for the new user
+        const uuid = crypto.randomUUID();
+
+        // Insert directly into users table
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert([{ 
+            uuid: uuid,
+            email, 
+            username, 
+            password: password,
+            stats: initialStats
+          }]);
+        
+        if (insertError) throw insertError;
 
         errorMessage.style.display = 'none';
         successMessage.style.display = 'block';

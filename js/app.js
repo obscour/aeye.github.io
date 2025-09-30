@@ -6,14 +6,17 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // Function to generate QR code (larger)
 async function generateQRCode({ onlyMobile = false } = {}) {
   try {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error || !user) throw error || new Error('No user logged in');
+    // Get user from localStorage (custom auth)
+    const userStr = localStorage.getItem('user');
+    if (!userStr) throw new Error('No user logged in');
+    
+    const user = JSON.parse(userStr);
 
-    // Encode user id, email, and full_name in the QR code
+    // Encode user id, email, and username in the QR code
     const qrPayload = {
       id: user.id,
       email: user.email,
-      full_name: user.user_metadata?.full_name || ""
+      username: user.username
     };
 
     const qrData = JSON.stringify(qrPayload);
@@ -57,19 +60,12 @@ async function generateQRCode({ onlyMobile = false } = {}) {
 // Function to display current user
 async function displayCurrentUser() {
   try {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error || !user) throw error || new Error('No user logged in');
-
-    // Fetch profile from profiles table
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('username, first_name, last_name')
-      .eq('id', user.id)
-      .single();
-
-    const welcomeText = profile
-      ? `Welcome! <strong>${profile.username}</strong> (${profile.last_name}, ${profile.first_name})`
-      : `Welcome! <strong>${user.email}</strong>`;
+    // Get user from localStorage (custom auth)
+    const userStr = localStorage.getItem('user');
+    if (!userStr) throw new Error('No user logged in');
+    
+    const user = JSON.parse(userStr);
+    const welcomeText = `Welcome! <strong>${user.username}</strong>`;
 
     // Desktop sidebar
     const currentUserDiv = document.getElementById('currentUser');
@@ -89,8 +85,8 @@ async function displayCurrentUser() {
 // Function to handle logout
 async function logout() {
   try {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    // Clear user from localStorage (custom auth)
+    localStorage.removeItem('user');
     window.location.href = 'index.html';
   } catch (error) {
     alert('Logout failed: ' + (error.message || error));
@@ -158,23 +154,26 @@ function updateSortIndicators() {
 // Function to fetch and display user stats
 async function displayUserStats() {
   try {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error || !user) throw error || new Error('No user logged in');
+    // Get user from localStorage (custom auth)
+    const userStr = localStorage.getItem('user');
+    if (!userStr) throw new Error('No user logged in');
+    
+    const user = JSON.parse(userStr);
 
-    // Fetch the stats JSON data from the profiles table
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
+    // Fetch the stats JSON data from the users table
+    const { data: userData, error: userError } = await supabase
+      .from('users')
       .select('stats')
-      .eq('id', user.id)
+      .eq('uuid', user.id)
       .single();
 
-    if (profileError) throw profileError;
+    if (userError) throw userError;
 
     // Parse the JSON stats and transform to table format
     let statsArray = [];
-    if (profile && profile.stats) {
+    if (userData && userData.stats) {
       try {
-        const statsJson = typeof profile.stats === 'string' ? JSON.parse(profile.stats) : profile.stats;
+        const statsJson = typeof userData.stats === 'string' ? JSON.parse(userData.stats) : userData.stats;
         
         // Transform the JSON object into an array for table display
         statsArray = Object.entries(statsJson).map(([char, data]) => ({
