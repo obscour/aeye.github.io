@@ -1,6 +1,6 @@
-// Supabase client init
-const SUPABASE_URL = "https://rucanbnwcjqkqjtrfnan.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1Y2FuYm53Y2pxa3FqdHJmbmFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc5MDc2MTEsImV4cCI6MjA2MzQ4MzYxMX0.WEblb8fwnnZmCoaKFZusO4vjPx_wk4kgSTp0WTwNbuQ";
+// Supabase client init *THIS IS AN ANON KEY*
+const SUPABASE_URL = "https://wkdkpwidvgcjkimureew.supabase.co/";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrZGtwd2lkdmdjamtpbXVyZWV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3OTA4MzksImV4cCI6MjA3MzM2NjgzOX0.6GNKe9fxq5xmWiKw5x7eyX3fASgG2q2avfyJZQWJI_s";
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Function to generate QR code (larger)
@@ -114,10 +114,11 @@ function renderStatsTable(stats) {
         <td>${row.mastery_score}</td>
         <td>${row.correct_count}</td>
         <td>${row.avg_response_time}</td>
+        <td>${row.streak || 0}</td>
       </tr>`;
     });
   } else {
-    tbody.innerHTML = '<tr><td colspan="5" class="text-center">No data found.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center">No data found.</td></tr>';
   }
   // Do NOT re-attach sorting event listeners here
 }
@@ -160,12 +161,37 @@ async function displayUserStats() {
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error || !user) throw error || new Error('No user logged in');
 
-    const { data: stats, error: statsError } = await supabase
-      .from('user_stats')
-      .select('alphanumeric_char, attempts, mastery_score, correct_count, avg_response_time')
-      .eq('user_id', user.id);
+    // Fetch the stats JSON data from the profiles table
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('stats')
+      .eq('id', user.id)
+      .single();
 
-    statsData = stats || [];
+    if (profileError) throw profileError;
+
+    // Parse the JSON stats and transform to table format
+    let statsArray = [];
+    if (profile && profile.stats) {
+      try {
+        const statsJson = typeof profile.stats === 'string' ? JSON.parse(profile.stats) : profile.stats;
+        
+        // Transform the JSON object into an array for table display
+        statsArray = Object.entries(statsJson).map(([char, data]) => ({
+          alphanumeric_char: char,
+          attempts: data.attempts || 0,
+          mastery_score: data.mastery || 0,
+          correct_count: data.correct || 0,
+          avg_response_time: 0, // Not available in current JSON structure
+          streak: data.streak || 0
+        }));
+      } catch (parseError) {
+        console.error('Error parsing stats JSON:', parseError);
+        statsArray = [];
+      }
+    }
+
+    statsData = statsArray;
     renderStatsTable(statsData);
     updateSortIndicators();
   } catch (error) {
