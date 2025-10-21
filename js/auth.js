@@ -1,5 +1,5 @@
 // Supabase client init
-const SUPABASE_URL = "https://wkdkpwidvgcjkimureew.supabase.co";
+const SUPABASE_URL = "https://wkdkpwidvgcjkimureew.supabase.co/";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrZGtwd2lkdmdjamtpbXVyZWV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3OTA4MzksImV4cCI6MjA3MzM2NjgzOX0.6GNKe9fxq5xmWiKw5x7eyX3fASgG2q2avfyJZQWJI_s";
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -25,7 +25,31 @@ function toggleForms() {
 }
 window.toggleForms = toggleForms;
 
+// Function to handle account type selection
+function selectAccountType(type) {
+  // Remove selected class from all cards
+  document.querySelectorAll('.account-type-card').forEach(card => {
+    card.classList.remove('selected');
+  });
+  
+  // Add selected class to clicked card
+  const selectedCard = document.getElementById(type + 'Card');
+  if (selectedCard) {
+    selectedCard.classList.add('selected');
+  }
+  
+  // Update the radio button
+  const radioButton = document.getElementById(type + 'Type');
+  if (radioButton) {
+    radioButton.checked = true;
+  }
+}
+window.selectAccountType = selectAccountType;
+
 document.addEventListener('DOMContentLoaded', function() {
+  // Initialize account type selection
+  selectAccountType('student');
+  
   // LOGIN
   const loginForm = document.getElementById('loginForm');
   if (loginForm) {
@@ -40,24 +64,91 @@ document.addEventListener('DOMContentLoaded', function() {
       successMessage.style.display = 'none';
       successMessage.textContent = '';
       try {
-        let emailToUse = identifier;
-        // If not an email, try to look up by username
-        if (!identifier.includes('@')) {
-          const { data: userProfile, error: userProfileError } = await supabase
-            .from('profiles')
-            .select('email')
+        // Custom login logic - check users table directly
+        let userData;
+        
+        console.log('Attempting login with:', identifier);
+        
+        if (identifier.includes('@')) {
+          // Login with email
+          console.log('Looking up user by email:', identifier);
+          const { data, error } = await supabase
+            .from('users')
+            .select('uuid, email, username, password, role')
+            .eq('email', identifier)
+            .single();
+          
+          console.log('Email lookup result:', { data, error });
+          
+          if (error || !data) {
+            throw new Error('No user found with that email');
+          }
+          userData = data;
+        } else {
+          // Login with username
+          console.log('Looking up user by username:', identifier);
+          const { data, error } = await supabase
+            .from('users')
+            .select('uuid, email, username, password, role')
             .eq('username', identifier)
             .single();
-          if (userProfile && userProfile.email) {
-            emailToUse = userProfile.email;
-          } else {
+          
+          console.log('Username lookup result:', { data, error });
+          
+          if (error || !data) {
             throw new Error('No user found with that username');
           }
+          userData = data;
         }
-        const { data, error } = await supabase.auth.signInWithPassword({ email: emailToUse, password });
-        if (error) throw error;
-        window.location.href = 'dashboard.html';
+        
+        console.log('Found user data:', userData);
+        console.log('Checking password. Provided:', password, 'Stored:', userData.password);
+        
+        // Check password (simple comparison for now)
+        if (userData.password !== password) {
+          throw new Error('Invalid password');
+        }
+        
+        console.log('Password match! Storing user session...');
+        
+        // Check user role from database
+        const isTeacher = userData.role === 'teacher';
+        
+        if (isTeacher) {
+          // Store teacher session
+          localStorage.setItem('teacher', JSON.stringify({
+            id: userData.uuid,
+            email: userData.email,
+            username: userData.username,
+            role: userData.role
+          }));
+          console.log('Teacher session stored, redirecting to teacher dashboard...');
+          
+          // Log teacher login
+          if (window.auditLog) {
+            await window.auditLog.logActivity('login', `Teacher ${userData.username} logged in`, userData.uuid);
+          }
+          
+          window.location.href = 'teacher-dashboard.html';
+        } else {
+          // Store regular user session
+          localStorage.setItem('user', JSON.stringify({
+            id: userData.uuid,
+            email: userData.email,
+            username: userData.username,
+            role: userData.role || 'student'
+          }));
+          console.log('User session stored, redirecting to dashboard...');
+          
+          // Log user login
+          if (window.auditLog) {
+            await window.auditLog.logActivity('login', `Student ${userData.username} logged in`, userData.uuid);
+          }
+          
+          window.location.href = 'dashboard.html';
+        }
       } catch (error) {
+        console.error('Login error:', error);
         errorMessage.style.display = 'block';
         errorMessage.textContent = error.message || 'Login failed. Please check your credentials.';
       }
@@ -75,6 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const email = document.getElementById('registerEmail').value;
       const password = document.getElementById('registerPassword').value;
       const confirmPassword = document.getElementById('confirmPassword').value;
+      const accountType = document.querySelector('input[name="accountType"]:checked').value;
       const errorMessage = document.getElementById('error-message');
       const successMessage = document.getElementById('success-message');
       errorMessage.style.display = 'none';
@@ -87,38 +179,54 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       try {
-        // Register with Supabase Auth
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { data: { first_name: firstName, last_name: lastName, username } }
-        });
-        if (error) throw error;
-
-        // Insert into profiles table (with id, email, username, first_name, last_name)
-        if (data.user) {
-          const { error: insertError } = await supabase
-            .from('profiles')
-            .insert([{ id: data.user.id, email, username, first_name: firstName, last_name: lastName }]);
-          if (insertError) throw insertError;
-
-          // Insert into user_stats table (one row for each alphanumeric_char A-Z, 0-9)
-          const chars = [
-            ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-          ];
-          const statsRows = chars.map(char => ({
-            user_id: data.user.id,
-            alphanumeric_char: char,
-            correct_count: 0,
-            attempts: 0,
-            avg_response_time: 0,
-            mastery_score: 0
-          }));
-          const { error: statsError } = await supabase
-            .from('user_stats')
-            .insert(statsRows);
-          if (statsError) throw statsError;
+        // Check if username or email already exists
+        const { data: existingUser, error: checkError } = await supabase
+          .from('users')
+          .select('username, email')
+          .or(`username.eq.${username},email.eq.${email}`);
+        
+        // Handle the case where no user exists (checkError is expected)
+        if (checkError && checkError.code !== 'PGRST116') {
+          throw checkError;
         }
+        
+        if (existingUser && existingUser.length > 0) {
+          const existing = existingUser[0];
+          if (existing.username === username) {
+            throw new Error('Username already exists');
+          }
+          if (existing.email === email) {
+            throw new Error('Email already exists');
+          }
+        }
+
+        // Create initial stats JSON structure for A-Z
+        const initialStats = {};
+        for (let char of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+          initialStats[char] = {
+            streak: 0,
+            correct: 0,
+            mastery: 0,
+            attempts: 0
+          };
+        }
+
+        // Generate a UUID for the new user
+        const uuid = crypto.randomUUID();
+
+        // Insert directly into users table
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert([{ 
+            uuid: uuid,
+            email, 
+            username, 
+            password: password,
+            role: accountType, // Add role field
+            stats: initialStats
+          }]);
+        
+        if (insertError) throw insertError;
 
         errorMessage.style.display = 'none';
         successMessage.style.display = 'block';

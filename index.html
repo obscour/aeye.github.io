@@ -57,9 +57,28 @@
         <input type="password" class="form-control" id="registerPassword" placeholder="Password" required />
         <label for="registerPassword">Password</label>
       </div>
-      <div class="form-floating mb-4">
+      <div class="form-floating mb-3">
         <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" required />
         <label for="confirmPassword">Confirm Password</label>
+      </div>
+      <div class="mb-4">
+        <label class="form-label fw-bold text-center d-block">Account Type</label>
+        <div class="account-type-container">
+          <div class="account-type-option" onclick="selectAccountType('student')">
+            <input type="radio" name="accountType" id="studentType" value="student" checked style="display: none;" />
+            <div class="account-type-card" id="studentCard">
+              <div class="account-type-icon">🎓</div>
+              <div class="account-type-label">Student</div>
+            </div>
+          </div>
+          <div class="account-type-option" onclick="selectAccountType('teacher')">
+            <input type="radio" name="accountType" id="teacherType" value="teacher" style="display: none;" />
+            <div class="account-type-card" id="teacherCard">
+              <div class="account-type-icon">👨‍🏫</div>
+              <div class="account-type-label">Teacher</div>
+            </div>
+          </div>
+        </div>
       </div>
       <button type="submit" class="btn btn-primary w-100">Register</button>
       <div class="mt-3">
@@ -68,6 +87,7 @@
     </form>
   </div>
 
-  <script src="js/auth.js"></script>
+  <script src="js/auth.js?v=2"></script>
+  <script src="js/audit-log.js"></script>
 </body>
 </html>

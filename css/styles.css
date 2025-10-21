@@ -98,6 +98,45 @@ body {
     height: auto !important;
     display: block;
     margin: 0 auto;
+    pointer-events: none !important;
+    cursor: default !important;
+  }
+  
+  /* Completely disable any hover effects on QR codes */
+  .qrcode-wrapper img,
+  .qrcode-wrapper canvas,
+  #qrcode img,
+  #qrcode canvas,
+  #qrcodeMobile img,
+  #qrcodeMobile canvas {
+    pointer-events: none !important;
+    cursor: default !important;
+  }
+  
+  .qrcode-wrapper img:hover,
+  .qrcode-wrapper canvas:hover,
+  #qrcode img:hover,
+  #qrcode canvas:hover,
+  #qrcodeMobile img:hover,
+  #qrcodeMobile canvas:hover {
+    pointer-events: none !important;
+    cursor: default !important;
+  }
+  
+  /* Override any tooltip libraries */
+  .qrcode-wrapper *,
+  #qrcode *,
+  #qrcodeMobile * {
+    pointer-events: none !important;
+    cursor: default !important;
+  }
+  
+  /* Disable tooltips globally for QR code areas */
+  .qrcode-wrapper [title],
+  #qrcode [title],
+  #qrcodeMobile [title] {
+    pointer-events: none !important;
+    cursor: default !important;
   }
   @media (min-width: 768px) {
     .fixed-sidebar {
@@ -129,5 +168,91 @@ body {
     min-width: 110px;
     width: auto;
     text-align: center;
+  }
+  
+  /* Account Type Selection Styles */
+  .account-type-container {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+  
+  .account-type-option {
+    cursor: pointer;
+    flex: 1;
+    max-width: 120px;
+  }
+  
+  .account-type-card {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .account-type-card:hover {
+    border-color: #007bff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+  }
+  
+  .account-type-card.selected {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border-color: #007bff;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+  }
+  
+  .account-type-card.selected::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    pointer-events: none;
+  }
+  
+  .account-type-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  
+  .account-type-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+  
+  .account-type-card.selected .account-type-label {
+    color: white;
+  }
+  
+  /* Responsive design for account type */
+  @media (max-width: 576px) {
+    .account-type-container {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .account-type-option {
+      max-width: none;
+    }
+    
+    .account-type-card {
+      padding: 1rem;
+    }
+    
+    .account-type-icon {
+      font-size: 1.5rem;
+    }
   }
   
