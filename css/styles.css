@@ -138,6 +138,7 @@ body {
     pointer-events: none !important;
     cursor: default !important;
   }
+  
   @media (min-width: 768px) {
     .fixed-sidebar {
       position: fixed;
